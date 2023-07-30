@@ -281,6 +281,7 @@ LATEX_ESCAPE_RULES = {
 def _latex_row(cell_values, colwidths, colaligns, escrules=None):
     if escrules is None:
         escrules = LATEX_ESCAPE_RULES
+
     def escape_char(c):
         return escrules.get(c, c)
 
@@ -1259,7 +1260,7 @@ def _align_header(
 
 
 def _remove_separating_lines(rows):
-    if type(rows) == list:
+    if isinstance(rows, list):
         separating_lines = []
         sans_rows = []
         for index, row in enumerate(rows):
@@ -1306,7 +1307,8 @@ def _bool(val):
 
 
 def _normalize_tabular_data(tabular_data, headers, showindex="default"):
-    """Transform a supported data type to a list of lists, and a list of headers, with headers padding.
+    """Transform a supported data type to a list of lists,
+    and a list of headers, with headers padding.
 
     Supported tabular data types:
 
@@ -2189,15 +2191,19 @@ def tabulate(
 
     # align columns
     # first set global alignment
-    if colglobalalign is not None: # if global alignment provided
+    if colglobalalign is not None:  # if global alignment provided
         aligns = [colglobalalign] * len(cols)
-    else: # default
+    else:  # default
         aligns = [numalign if ct in [int, float] else stralign for ct in coltypes]
     # then specific alignements
     if colalign is not None:
         assert isinstance(colalign, Iterable)
         if isinstance(colalign, str):
-            warnings.warn(f"As a string, `colalign` is interpreted as {list(colalign)}. Did you mean `colglobalalign = \"{colalign}\"` or `colalign = (\"{colalign}\",)`?", stacklevel=2)
+            warnings.warn(
+                f"As a string, `colalign` is interpreted as {list(colalign)}. "
+                + f'Did you mean `colglobalalign = "{colalign}"` or `colalign = ("{colalign}",)`?',
+                stacklevel=2,
+            )
         for idx, align in enumerate(colalign):
             if not idx < len(aligns):
                 break
@@ -2216,20 +2222,25 @@ def tabulate(
         # align headers and add headers
         t_cols = cols or [[""]] * len(headers)
         # first set global alignment
-        if headersglobalalign is not None: # if global alignment provided
+        if headersglobalalign is not None:  # if global alignment provided
             aligns_headers = [headersglobalalign] * len(t_cols)
-        else: # default
+        else:  # default
             aligns_headers = aligns or [stralign] * len(headers)
         # then specific header alignements
         if headersalign is not None:
             assert isinstance(headersalign, Iterable)
             if isinstance(headersalign, str):
-                warnings.warn(f"As a string, `headersalign` is interpreted as {list(headersalign)}. Did you mean `headersglobalalign = \"{headersalign}\"` or `headersalign = (\"{headersalign}\",)`?", stacklevel=2)
+                warnings.warn(
+                    f"As a string, `headersalign` is interpreted as {list(headersalign)}. "
+                    + f'Did you mean `headersglobalalign = "{headersalign}"` '
+                    + f'or `headersalign = ("{headersalign}",)`?',
+                    stacklevel=2,
+                )
             for idx, align in enumerate(headersalign):
                 hidx = headers_pad + idx
                 if not hidx < len(aligns_headers):
                     break
-                if align == "same" and hidx < len(aligns): # same as column align
+                if align == "same" and hidx < len(aligns):  # same as column align
                     aligns_headers[hidx] = aligns[hidx]
                 elif align != "global":
                     aligns_headers[hidx] = align
@@ -2254,7 +2265,14 @@ def tabulate(
     _reinsert_separating_lines(rows, separating_lines)
 
     return _format_table(
-        tablefmt, headers, aligns_headers, rows, minwidths, aligns, is_multiline, rowaligns=rowaligns
+        tablefmt,
+        headers,
+        aligns_headers,
+        rows,
+        minwidths,
+        aligns,
+        is_multiline,
+        rowaligns=rowaligns,
     )
 
 
@@ -2380,7 +2398,9 @@ class JupyterHTMLStr(str):
         return self
 
 
-def _format_table(fmt, headers, headersaligns, rows, colwidths, colaligns, is_multiline, rowaligns):
+def _format_table(
+    fmt, headers, headersaligns, rows, colwidths, colaligns, is_multiline, rowaligns
+):
     """Produce a plain-text representation of the table."""
     lines = []
     hidden = fmt.with_header_hide if (headers and fmt.with_header_hide) else []
@@ -2442,8 +2462,9 @@ def _format_table(fmt, headers, headersaligns, rows, colwidths, colaligns, is_mu
         _append_line(lines, padded_widths, colaligns, fmt.linebelow)
 
     if headers or rows:
+        # pylint: disable=comparison-with-callable
         output = "\n".join(lines)
-        if fmt.lineabove == _html_begin_table_without_header: # pylint: disable=comparison-with-callable
+        if fmt.lineabove == _html_begin_table_without_header:
             return JupyterHTMLStr(output)
         return output
     return ""
@@ -2564,7 +2585,6 @@ class _CustomTextWrap(textwrap.TextWrapper):
         chunks.reverse()
 
         while chunks:
-
             # Start the list of chunks that will make up the current line.
             # cur_len is just the length of all the chunks in cur_line.
             cur_line = []
@@ -2717,7 +2737,7 @@ def _main():
             print(usage)
             sys.exit(0)
     files = [sys.stdin] if not args else args
-    with (sys.stdout if outfile == "-" else open(outfile, "w")) as out:
+    with sys.stdout if outfile == "-" else open(outfile, "w") as out:
         for f in files:
             if f == "-":
                 f = sys.stdin
