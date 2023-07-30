@@ -1,6 +1,9 @@
 python-tabulate
 ===============
 
+*About this fork:* this fork is made to publish a newest version to PIP, with all
+available fixes. Please check out the original repo.
+
 Pretty-print tabular data in Python, a library and a command-line
 utility.
 

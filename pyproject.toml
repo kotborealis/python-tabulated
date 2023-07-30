@@ -3,10 +3,10 @@ requires = ["setuptools>=61.2.0", "setuptools_scm[toml]>=3.4.3"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "tabulate"
+name = "tabulated"
 authors = [{name = "Sergey Astanin", email = "s.astanin@gmail.com"}]
 license = {text = "MIT"}
-description = "Pretty-print tabular data"
+description = "Pretty-print tabular data, fork of original tabulate."
 readme = "README.md"
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -24,7 +24,7 @@ requires-python = ">=3.7"
 dynamic = ["version"]
 
 [project.urls]
-Homepage = "https://github.com/astanin/python-tabulate"
+Homepage = "https://github.com/kotborealis/python-tabulated"
 
 [project.optional-dependencies]
 widechars = ["wcwidth"]
